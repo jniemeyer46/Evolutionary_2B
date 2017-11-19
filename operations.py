@@ -241,22 +241,16 @@ def OverSelection(parents, parentFitness, numParents):
 	return listParents, listParentFitness
 
 
-def Recombination(parents, parentNumber):
-	newParents = []
-	newParentsFitness = []
+def Recombination(parents):
+	p1 = random.choice(parents)
+	p2 = random.choice(parents)
 
-	for i in range(parentNumber):
-		p1 = random.choice(parents)
-		p2 = random.choice(parents)
+	# determine the amout of genes used from parent 1... the rest from parent 2
+	amount_parent1_genes = random.randrange(0, len(p1))
 
-		# determine the amout of genes used from parent 1... the rest from parent 2
-		amount_parent1_genes = random.randrange(0, len(p1))
+	tree_list = p1[0:amount_parent1_genes] + p2[amount_parent1_genes:]
 
-		newParent = p1[0:amount_parent1_genes] + p2[amount_parent1_genes:]
-
-		newParents.append(newParent)
-		
-	return newParents, newParentsFitness
+	return tree_list
 
 
 def mutate(tree_list, memoryLength):
@@ -269,12 +263,52 @@ def mutate(tree_list, memoryLength):
 		else:
 			# Obtain the two things needed to make a leaf
 			agent = random.choice(agents)
-			num = random.randrange(1, (memoryLength + 1))
+			num = random.randrange(1, (memoryLength - 1))
 
 			# The termination node created
 			leaf = agent + str(num)
 
 			tree_list[i] = leaf
+
+
+def Truncation(currentParents, currentParentFitness, parentNumber):
+	currentParents = currentParents[0:parentNumber]
+	currentParentFitness = currentParentFitness[0:parentNumber]
+
+	return currentParents, currentParentFitness
+
+
+def kTournament(currentParents, currentParentFitness, parentNumber):
+	offspring = []
+	offspring_fitness = []
+
+	for num in range(0, parentNumber):
+		highest_index = 0
+
+		tournament_pool, tournament_fitness_pool = deepcopy(createOffspringTourney(currentParents, currentParentFitness, parentNumber))
+
+		for index in range(0, len(tournament_fitness_pool)):
+			if tournament_fitness_pool[index] > tournament_fitness_pool[highest_index] and index < len(currentParents):
+				highest_index = index
+
+		offspring.append(currentParents[highest_index])
+		del currentParents[highest_index]
+		offspring_fitness.append(currentParentFitness[highest_index])
+		del currentParentFitness[highest_index]
+
+	return offspring, offspring_fitness
+
+
+def createOffspringTourney(currentParents, currentParentFitness, parentNumber):
+	Tourney_participants = []
+	Tourney_participants_fitness_values = []
+
+	for i in range(0, parentNumber):
+		rand_location = random.randrange(0, len(currentParents))
+		Tourney_participants.append(currentParents[rand_location])
+		Tourney_participants_fitness_values.append(currentParentFitness[rand_location])
+
+	return Tourney_participants, Tourney_participants_fitness_values
 		
 
 

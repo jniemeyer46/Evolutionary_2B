@@ -29,8 +29,10 @@ def main():
 	# initial formatting of the result log with Result Log at the top and the parameters underneath that
 	result_log.write("Result Log \n")
 	result_log.write("Random Seed = %s \n" % container.seed)
-	result_log.write("Parameters used = {'fitness evaluations': %s, 'number of runs': %s, 'problem solution location': '%s'}\n\n"
-					% (container.fitness, container.runs, container.prob_solution_file))
+	result_log.write("Parameters used = {'k': %s, 'd': %s, 'l': %s, 'n': %s, 'mu': %s, 'lambda': %s, 'p': %s, 'fitness evaluations': %s, 'number of runs': %s, 'problem solution location': '%s'}\n\n"
+					% (container.k, container.d, container.l, container.n, container.mu, container.generations, container.p, container.fitness, container.runs, container.prob_solution_file))
+	result_log.write(str(container.mu) + "\n")
+
 
 	threads = []
 	for run in range(1, container.runs + 1):
@@ -55,13 +57,13 @@ def main():
 	container.results.sort(key=itemgetter(0))
 
 	# Inputting the results into the result log
-	for list in container.results:
-		for i in range(len(list)):
+	for res in container.results:
+		for i in range(len(res)):
 			if i == 0:
-				result_log.write("Run " + str(list[i]) + "\n")
+				result_log.write("Run " + str(res[i]) + "\n")
 			else:
-				evalValue, fitnessValue = list[i]
-				result_log.write(str(evalValue) + "	" + str(fitnessValue) + "\n")
+				evalValue, averageValue, bestValue = res[i]
+				result_log.write(str(evalValue) + "	" + str(averageValue) + "	"+ str(bestValue) + "\n")
 
 		result_log.write("\n")
 
@@ -104,22 +106,25 @@ def evaluations(name, container):
 
 	#Initialization
 	# Play 2k games before counting anything towards fitness
-	for game in range(2000):
+	for game in range(30):
 		# Creates the tree and a list of the elements in the tree in order that they were created
-			tree, tree_list = operations.createTree(container.d, container.k)
+		tree, tree_list = operations.createTree(container.d, container.k)
 
-			# Reorders the list so that they are in the preordered form
-			tree_list = operations.reorder(container.d, tree_list)
+		# Reorders the list so that they are in the preordered form
+		tree_list = operations.reorder(container.d, tree_list)
 
-			newDecision = operations.evaluate(memory, container.k, tree_list)
+		newDecision = operations.evaluate(memory, container.k, tree_list)
 
-			fitnessP, fitnessO = operations.yearsInJail(newDecision, container.decision)
+		fitnessP, fitnessO = operations.yearsInJail(newDecision, container.decision)
 
-			# Set the new tit-for-tat decision
-			container.decision = newDecision
+		# Set the new tit-for-tat decision
+		container.decision = newDecision
 
-			parents.append(tree_list)
-			parentFitness.append(fitnessP)
+		parents.append(tree_list)
+		parentFitness.append(fitnessP)
+
+		if game % 20 == False:
+			print(str(game) + " done")
 
 	# Fitness Evaluations begin
 	for evals in range(1, container.fitness + 1):
@@ -132,10 +137,15 @@ def evaluations(name, container):
 		tempP = 0
 		tempO = 0
 
+		highest_fitness = 0
+
 		for generation in range(container.generations):
 			# Used in the coming plays
 			currentParents = []
 			currentParentFitness = []
+
+			offSpring = []
+			offSpringFitness = []
 
 			# Parent Selection
 			if container.fitnessProportional == 1:
@@ -144,14 +154,13 @@ def evaluations(name, container):
 				currentParents, currentParentFitness = deepcopy(operations.OverSelection(parents, parentFitness, container.parentNumber))
 
 
-			# Recombination
-			if container.subTree_Crossover_Recombination == 1:
-				operations.Recombination(currentParents, container.parentNumber)
-
-
 			# This is where the game is actually played
 			for play in range(container.l):
-				tree_list = deepcopy(random.choice(currentParents))
+
+
+				# Recombination
+				if container.subTree_Crossover_Recombination == 1:
+					tree_list = deepcopy(operations.Recombination(currentParents))
 
 
 				# Mutation
@@ -166,11 +175,16 @@ def evaluations(name, container):
 
 				fitnessP, fitnessO = operations.yearsInJail(newDecision, container.decision)
 
+				# Updates the highest_fitness_value
+				if highest_fitness < fitnessP:
+					highest_fitness = fitnessP
+
 				# Set the new tit-for-tat decision
 				container.decision = newDecision
 
+				offSpring.append(tree_list)
+				offSpringFitness.append(fitnessP)
 				PfitnessValues.append(fitnessP)
-				OfitnessValues.append(fitnessO)
 
 				if fitnessP > container.solution_fitness:
 					container.solution_fitness = fitnessP
@@ -180,43 +194,32 @@ def evaluations(name, container):
 						solution_log.write(str(i) + " ")
 
 
-				# Survival Selection
-				if container.truncation == 1:
-					pass
-				elif container.kTournament == 1:
-					pass
+			# Survival Selection
+			if container.truncation == 1:
+				parents, parentFitness = deepcopy(operations.Truncation(offSpring, offSpringFitness, container.parentNumber))
+			elif container.kTournament == 1:
+				parents, parentFitness = deepcopy(operations.kTournament(offSpring, offSpringFitness, container.parentNumber))
 
 
-				# Bloat Control
-				if container.parsimonyPressure == 1:
-					pass
-
-
-				# Termination
-				if container.numEvals == 1:
-					if play == (container.terminationEvals - 1):
-						break
-				elif container.noChange == 1:
-					if operations.noChange(PfitnessValues, container.n):
-						break					
+			# Termination
+			if container.numEvals == 1:
+				if generation == (container.terminationEvals - 1):
+					break
+			elif container.noChange == 1:
+				if operations.noChange(PfitnessValues, container.n):
+					break	
 
 
 		for value in PfitnessValues:
 			tempP += value
 
-		for value in OfitnessValues:
-			tempO += value
+		averageValue = tempP / len(PfitnessValues)
 
-		PfitnessValue = tempP / len(PfitnessValues)
-		OfitnessValue = tempO / len(OfitnessValues)
-
-		if PfitnessValue > highest_fitness:
-			highest_fitness = PfitnessValue
-			log_list.append((evals, PfitnessValue))
+		log_list.append((evals, averageValue, highest_fitness))
 
 
-		if evals % 200 == False:
-			print("\n" + "Run " + str(name) + "\n" + str(evals) + "	" + str(PfitnessValue))
+		if evals % 500 == False:
+			print("\n" + "Run " + str(name) + "\n" + str(evals) + "	" + str(averageValue) + "	" + str(highest_fitness))
 
 	container.results.append(log_list)
 
