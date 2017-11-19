@@ -24,7 +24,7 @@ Recombination: subTree_Crossover_Recombination = 1
 
 Mutation: subTree_Crossover_Mutation = 1
 
-survivalSelection: Truncation = 0, kTournament = 1
+survivalSelection: Truncation = 1, kTournament = 0
 
 bloatControl: parsimonyPressure = 1
 

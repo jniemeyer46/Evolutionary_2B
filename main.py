@@ -63,7 +63,7 @@ def main():
 				result_log.write("Run " + str(res[i]) + "\n")
 			else:
 				evalValue, averageValue, bestValue = res[i]
-				result_log.write(str(evalValue) + "	" + str(averageValue) + "	"+ str(bestValue) + "\n")
+				result_log.write(str(evalValue) + "	" + str("%.2f" % averageValue) + "	"+ str(bestValue) + "\n")
 
 		result_log.write("\n")
 
@@ -140,27 +140,27 @@ def evaluations(name, container):
 		highest_fitness = 0
 
 		for generation in range(container.generations):
-			# Used in the coming plays
+			# Used for parent selection
 			currentParents = []
 			currentParentFitness = []
 
+			# Used for survival selection
 			offSpring = []
 			offSpringFitness = []
 
+
 			# Parent Selection
 			if container.fitnessProportional == 1:
-				currentParents, currentParentFitness = deepcopy(operations.fitnessProportional(parents, parentFitness, container.parentNumber))
+				currentParents, currentParentFitness = operations.fitnessProportional(parents, parentFitness, container.parentNumber)
 			elif container.overSelection == 1:
-				currentParents, currentParentFitness = deepcopy(operations.OverSelection(parents, parentFitness, container.parentNumber))
+				currentParents, currentParentFitness = operations.OverSelection(parents, parentFitness, container.parentNumber)
 
 
 			# This is where the game is actually played
 			for play in range(container.l):
-
-
 				# Recombination
 				if container.subTree_Crossover_Recombination == 1:
-					tree_list = deepcopy(operations.Recombination(currentParents))
+					tree_list = operations.Recombination(currentParents)
 
 
 				# Mutation
@@ -196,9 +196,9 @@ def evaluations(name, container):
 
 			# Survival Selection
 			if container.truncation == 1:
-				parents, parentFitness = deepcopy(operations.Truncation(offSpring, offSpringFitness, container.parentNumber))
+				parents, parentFitness = operations.Truncation(offSpring, offSpringFitness, container.parentNumber)
 			elif container.kTournament == 1:
-				parents, parentFitness = deepcopy(operations.kTournament(offSpring, offSpringFitness, container.parentNumber))
+				parents, parentFitness = operations.kTournament(offSpring, offSpringFitness, container.parentNumber)
 
 
 			# Termination
@@ -218,8 +218,8 @@ def evaluations(name, container):
 		log_list.append((evals, averageValue, highest_fitness))
 
 
-		if evals % 500 == False:
-			print("\n" + "Run " + str(name) + "\n" + str(evals) + "	" + str(averageValue) + "	" + str(highest_fitness))
+		if evals % 100 == False:
+			print("\n" + "Run " + str(name) + "\n" + str("%.2f" % averageValue) + "	" + str(averageValue) + "	" + str(highest_fitness))
 
 	container.results.append(log_list)
 
