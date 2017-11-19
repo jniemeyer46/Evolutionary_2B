@@ -1,0 +1,33 @@
+runs = 30
+fitness = 10000
+
+k = 5
+d = 5
+l = 30
+n = 5
+mu = 0.01
+lambda = 10
+parentNumber = 5
+p = 1
+terminationEvals = 5
+
+
+prob_log_file = logs/log1.txt
+prob_solution_file = solutions/solution1.txt
+
+
+Initialize: Ramped_halfandhalf = 1
+
+parentSelection: Fitness_Proportional_Selection = 0, Over_Selection = 1
+
+Recombination: subTree_Crossover_Recombination = 1
+
+Mutation: subTree_Crossover_Mutation = 1
+
+survivalSelection: Truncation = 1, kTournament = 0
+
+bloatControl: parsimonyPressure = 1
+
+Termination: numEvals = 0, noChange = 1
+
+newSeed = 1
