@@ -106,7 +106,7 @@ def evaluations(name, container):
 
 	#Initialization
 	# Play 2k games before counting anything towards fitness
-	for game in range(30):
+	for game in range(2000):
 		# Creates the tree and a list of the elements in the tree in order that they were created
 		tree, tree_list = operations.createTree(container.d, container.k)
 
@@ -123,7 +123,7 @@ def evaluations(name, container):
 		parents.append(tree_list)
 		parentFitness.append(fitnessP)
 
-		if game % 20 == False:
+		if game % 200 == False:
 			print(str(game) + " done")
 
 	# Fitness Evaluations begin
@@ -196,9 +196,9 @@ def evaluations(name, container):
 
 			# Survival Selection
 			if container.truncation == 1:
-				parents, parentFitness = operations.Truncation(offSpring, offSpringFitness, container.parentNumber)
+				parents, parentFitness = deepcopy(operations.Truncation(offSpring, offSpringFitness, container.parentNumber))
 			elif container.kTournament == 1:
-				parents, parentFitness = operations.kTournament(offSpring, offSpringFitness, container.parentNumber)
+				parents, parentFitness = deepcopy(operations.kTournament(offSpring, offSpringFitness, container.parentNumber))
 
 
 			# Termination
@@ -218,7 +218,7 @@ def evaluations(name, container):
 		log_list.append((evals, averageValue, highest_fitness))
 
 
-		if evals % 100 == False:
+		if evals % 200 == False:
 			print("\n" + "Run " + str(name) + "\n" + str("%.2f" % averageValue) + "	" + str(averageValue) + "	" + str(highest_fitness))
 
 	container.results.append(log_list)
