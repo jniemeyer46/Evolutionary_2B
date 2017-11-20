@@ -1,0 +1,97 @@
+\documentclass[•]{article}
+\usepackage{graphicx}
+\usepackage{listings}
+\graphicspath{ {/Users/jjniemeyer46/Desktop/Pics/EC_1d} }
+
+\usepackage{color}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\author{John Niemeyer\\JJNB78@mst.edu}
+\title{COMP SCI 5401 FS2017 Assignment 2b}
+
+\begin{document}
+\maketitle
+
+\section*{\begin{center} Experiment parameters and graphs \end{center}}
+\section{IPD Results}
+
+\subsection{Graphs}
+\noindent \includegraphics [scale=0.65] {/prob1a_graph}
+
+\pagebreak
+\subsection{Result Tables}
+Problem 1a: final results\\\\
+\noindent \includegraphics [scale=0.65] {/prob1a_results}
+
+\pagebreak
+\subsection{Statistical Analysis}
+\noindent \includegraphics [scale=0.65] {/prob1a_best}
+\noindent \includegraphics [scale=0.65] {/prob1a_average}\\\\
+\indent So according to the statistical analysis (shown above) the p-value for both best fitness and average fitness is not low enough to say that the results are statistically significant.  That means that the t-value of -0.21508 and the t-value of -0.98697, computed using the tables given, were not far enough apart from the t-value given of 2.045 to make the difference in the fitness values statistically significant.
+
+\pagebreak
+\subsection{EA Configurations}
+If you want to get the same results you have to change the newSeed variable to 0 (Zero) in the configuration file in order to use the previous seed.\\\\
+
+Using config1.txt 
+\begin{lstlisting}
+runs = 30
+fitness = 10000
+
+k = 5
+d = 10
+l = 30
+n = 5
+mu = 0.01
+lambda = 2
+parentNumber = 5
+p = 1
+terminationEvals = 3
+
+
+prob_log_file = logs/log1.txt
+prob_solution_file = solutions/solution1.txt
+
+
+Initialize: Ramped_halfandhalf = 1
+
+parentSelection: Fitness_Proportional_Selection = 1, Over_Selection = 0
+
+Recombination: subTree_Crossover_Recombination = 1
+
+Mutation: subTree_Crossover_Mutation = 1
+
+survivalSelection: Truncation = 1, kTournament = 0
+
+bloatControl: parsimonyPressure = 1
+
+Termination: numEvals = 1, noChange = 0
+
+newSeed = 1
+\end{lstlisting}
+
+\end{document}
