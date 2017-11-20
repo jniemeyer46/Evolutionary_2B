@@ -219,7 +219,7 @@ def evaluations(name, container):
 
 
 		if evals % 200 == False:
-			print("\n" + "Run " + str(name) + "\n" + str("%.2f" % averageValue) + "	" + str(averageValue) + "	" + str(highest_fitness))
+			print("\n" + "Run " + str(name) + "\n" + str(evals) + "	" + str("%.2f" % averageValue) + "	" + str(highest_fitness))
 
 	container.results.append(log_list)
 
